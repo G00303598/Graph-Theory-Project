@@ -1,48 +1,52 @@
-#This program converts an infix expression to postfix expression
-#Operators: ., |, *
-#Include more operators eventually
+# This program converts an infix expression to postfix expression
+# Operators: ., |, *
+# Include more operators eventually
+# Algorithm reference: https://brilliant.org/wiki/shunting-yard-algorithm/
 
-def checkOperator(symbol):
-    if symbol == '.' or symbol == '|' or symbol == '*':
+from collections import deque
+stack = []  # Used to store operations: https://dbader.org/blog/stacks-in-python
+output = deque()  # used to store output: https://dbader.org/blog/queues-in-python
+token = []  # used to store tokens being read in: https://dbader.org/blog/stacks-in-python
+
+SYMBOLS = ['.', '|', '*']
+
+
+def convert_infix_to_postfix(infix_expression):
+    # while there are tokens to be read
+    for i, e in enumerate(infix_expression):
+        token = e
+        # print(token)  # used to verify successful iterations
+
+        # if token is 0 or 1.. will modify later to include better alphabet
+        if token is '0' or token is '1':
+            # add to queue
+            output.append(token)
+            # print(output)
+
+        # if token is operator
+        #
+        if token in SYMBOLS:
+            # check precedence
+            for i in stack:
+                if token:
+                    output.append(stack.pop())
+            stack.append(token)
+
+    print(stack)
+    print(output)
+
+    for i in stack:
+        output.append(stack.pop())
+    print(output)
+
+
+def check_precedence(input_token):
+    if input_token is '*':
+        return 2
+    if input_token is '.':
         return 1
-    else:
+    if input_token is '|':
         return 0
 
-def convertInfixToPostFix(infix_Expression):
-    #Define the stack to pop and push from
-    stack = []
-    postFix_Expression = ''
 
-    #Pushing ( to front of stack and appending ) to end to form regular expression
-    stack.insert(0, '(')
-    stack.append(')')
-
-    #initialise before loop
-    i = 0
-    item = infix_Expression[i]
-
-    #read in infix expression until empty
-    for i in infix_Expression:
-        print(item) #Testing purposes
-
-        # if operand encountered, push to stack
-        if item == checkOperator(item):
-            postFix_Expression.join(item)
-            print(postFix_Expression)
-
-        # if left parenthesis encountered, push to stack
-        elif item == '(':
-            stack.insert(i, item)
-            print(stack)
-
-        elif item.isalpha() or item.isdigit():
-            postFix_Expression.join(item)
-            print(stack)
-
-
-
-
-
-
-convertInfixToPostFix("a.(b.b)*.a")
-
+convert_infix_to_postfix("0.(1.1)*.0")
