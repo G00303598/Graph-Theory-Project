@@ -1,57 +1,64 @@
 # This program converts an infix expression to postfix expression
 # Operators: ., |, *
-# Include more operators eventually
+# Alphabet: a,b,c
+# Include more operators + expand alphabet eventually
 # Algorithm reference: https://brilliant.org/wiki/shunting-yard-algorithm/
 
 stack = []  # Used to store operations: https://dbader.org/blog/stacks-in-python
 output = []  # used to store output: https://dbader.org/blog/queues-in-python
 token = []  # used to store tokens being read in: https://dbader.org/blog/stacks-in-python
 
-SYMBOLS = ['.', '|', '*']
+SYMBOLS = ['*', '-', '+']  # define operators to be included
 
 
 def convert_infix_to_postfix(infix_expression):
     # while there are tokens to be read
-    for i, e in enumerate(infix_expression):
+    for element in infix_expression:
         # read a token
-        token = e
+        token = element
+        new_precedence = check_precedence(token)
         # print(token)  # used to verify successful iterations
 
-        # if token is 0 or 1.. will modify later to include better alphabet
-        if token is 'a' or token is 'b' or token is 'c':
+        # if token is part of alphabet
+        if token.isalpha() or token.isdigit():
             # add to queue
             output.append(token)
             # print(output)
 
-        # if token is operator
-        elif token in SYMBOLS:
+        # I ignore the brackets --> ( )   as I thought it was a redundant step
+        # If token is an accepted operator:
+        if token in SYMBOLS:
+            # Loop through the stack
+            for i in stack:
+                token_to_check = i  # sets the token to check as the token at i on the stack
+                previous_precedence = check_precedence(token_to_check)  # find the precedence of the token on the stack
+
+                # if there's an operator on the stack with a greater precedence than what's being read in
+                if previous_precedence > new_precedence:
+                    output.append(stack.pop())
+
+            # Add token to the stack
             stack.append(token)
-            precedence = check_precedence(token)
 
-            # check precedence
-            if precedence == 2:
-                output.append(stack.pop())
-            elif precedence == 1 or precedence == 0:
-                continue
+    # Put remainder of stack onto output
+    # count number of elements left in list
+    stack_count = len(stack)
+    for i in range(stack_count):
+        output.append(stack.pop())
 
-        precedence = check_precedence(token)
-        # check precedence
-        if precedence == 1:
-            output.append(stack.pop())
-
-    output.append(stack.pop())
     return output
 
 
 def check_precedence(input_token):
     if input_token is '*':
         return 2
-    if input_token is '.':
+    if input_token is '+':
         return 1
-    if input_token is '|':
+    if input_token is '-':
         return 0
 
 
-convert_infix_to_postfix("a.(b.b)|a")
-#convert_infix_to_postfix("(a|b).c")
+# convert_infix_to_postfix("0.(1.1)*.0")
+convert_infix_to_postfix("(a+b) - c * 5")
+# convert_infix_to_postfix(".|.*")  # using to test order of precedence
 print(output)
