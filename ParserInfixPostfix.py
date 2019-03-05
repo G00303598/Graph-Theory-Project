@@ -10,7 +10,7 @@ output = []  # used to store output: https://dbader.org/blog/queues-in-python
 SYMBOLS = ['*', '-', '+', '^', '|', '.']  # define operators to be included
 
 
-def v3_convert_infix_to_postfix(infix_expression):
+def convert_infix_to_postfix(infix_expression):
     print("INFIX: ", infix_expression)
     # loop through input
     for i, token in enumerate(infix_expression):
@@ -23,6 +23,7 @@ def v3_convert_infix_to_postfix(infix_expression):
             output.append(token)
 
         if token in SYMBOLS:
+
             if len(stack) is 0:
                 # means nothing on stack
                 stack.append(token)
@@ -31,144 +32,29 @@ def v3_convert_infix_to_postfix(infix_expression):
                 token_precedence = check_precedence(token)  # gets precedence value of input
                 stack_precedence = check_precedence(stack[-1])  # gets precedence value of top of stack
 
-                if token_precedence >= stack_precedence:
-                    if token is '(':
-                        stack.pop()
-                    else:
-                        stack.append(token)
+                # while stack has a operator of greater precedence than input
+                while stack and token_precedence <= stack_precedence:
+                    to_output = stack.pop()  # stores token to send to output
+                    output.append(to_output)
 
-                elif token_precedence <= stack_precedence:
-                    if token is '(':
-                        stack.pop()
-                    else:
-                        to_output = stack.pop()  # stores token to send to output
-                        output.append(to_output)
-                        stack.append(token)
+                # push lesser operator to stack
+                stack.append(token)
 
         # if right bracket encountered
-        if token is ')':
-            # pop all from stack to output
-            for i, el in enumerate(stack):
+        if token == ')':
+            while stack[-1] != '(':
                 to_output = stack.pop()
                 output.append(to_output)
-                if el is '(':
-                    stack.pop()
-    print(stack)
+            stack.pop()  # ( found, pop from stack
+
     # clear remainder on stack
     while stack:
         to_output = stack.pop()
         output.append(to_output)
 
-    print(output)
-    # print("POSTFIX: ", ''.join(output))  # prints as string
-# END V3
-
-
-def v2_convert_infix_to_postfix(infix_expression):
-    # loop through input
-    for token in infix_expression:
-        stack_count = len(stack)
-
-        # print("INPUT: ", token)
-        # print("STACK: ", stack)
-        # print("OUTPUT: ", output)
-        # print("STACK_COUNT: ", stack_count)
-
-        if token.isalpha() or token.isdigit():
-            output.append(token)
-
-        if token is '(':
-            stack.append(token)
-
-        if token in SYMBOLS:
-            stack.append(token)
-            if stack_count > 0:
-                input_precedence = check_precedence(token)
-                stack_item = stack
-                stack_precedence = check_precedence(stack_item)
-
-                if stack_item in SYMBOLS:
-                    if input_precedence <= stack_precedence:
-                        output.append(stack_item)
-
-                    if input_precedence >= stack_precedence:
-                        stack.append(token)
-
-        if token is ')':
-            # While stack is not (
-            for i in stack:
-                if i is '(':
-                    stack.pop()
-                else:
-                    output.append(stack.pop())
-
-    stack_count = len(stack)
-    # Clear stack + append to output
-    for i in range(stack_count):
-        stack_item = stack.pop()
-        if i is '(':
-            # ( encountered
-            continue
-        else:
-            output.append(stack_item)
-
-    print(stack)
-    print(output)
-
-
-def convert_infix_to_postfix(infix_expression):
-    # while there are tokens to be read
-    for element in infix_expression:
-        print("Operator Stack: ", stack)
-        # read a token
-        token = element
-        new_precedence = check_precedence(token)
-        # print(token)  # used to verify successful iterations
-
-        # if token is part of alphabet
-        if token.isalpha() or token.isdigit():
-            # add to queue
-            output.append(token)
-
-        # If token is an accepted operator:
-        if token in SYMBOLS:
-            # Loop through the stack
-            for i in stack:
-                token_to_check = i  # sets the token to check as the token at i on the stack
-                previous_precedence = check_precedence(token_to_check)  # find the precedence of the token on the stack
-
-                # if there's an operator on the stack with a greater precedence than what's being read in
-                if previous_precedence >= new_precedence:
-                    to_output = stack.pop()  # store pop from stack
-                    # had to do it this way as brackets were falling through to here and
-                    # being added to output queue
-                    if to_output is '(':
-                        continue
-                    if to_output in SYMBOLS:
-                        output.append(to_output)  # add to output stack
-
-            # Add token to the stack
-            stack.append(token)
-
-        if token is '(':
-            stack.append(token)
-
-        if token is ')':
-            for i in stack:
-                stack_item = stack.pop()
-                if i is '(':
-                    continue
-                else:
-                    output.append(stack_item)
-
-    # Put remainder of stack onto output
-    # count number of elements left in list
-    stack_count = len(stack)
-    for i in range(stack_count):
-        output.append(stack.pop())
-
-    print(stack)
-    print(output)
+    # print(output)  # prints as list
+    print("POSTFIX: ", ''.join(output))  # prints as string
+# END
 
 
 def check_precedence(input_token):
@@ -182,24 +68,10 @@ def check_precedence(input_token):
         return -1
 
 
-# TESTS FROM: http://www.oxfordmathcenter.com/drupal7/node/628
-# convert_infix_to_postfix("A * B + C")  # Test 1 - Pass
-# convert_infix_to_postfix("A + B * C ")  # Test 2 - Pass
-# convert_infix_to_postfix("A * (B + C)")  # Test 3 - Pass
-# convert_infix_to_postfix("A - B + C")  # Test 4 - Pass
-# convert_infix_to_postfix("A * B ^ C + D ")  # Test 5 - Fail
-# convert_infix_to_postfix("A * (B + C * D) + E")  # Test 6 - Fail
-
-# VERSION 2 TESTS -- Version was set up for V3, but mostly a fail.
-# v2_convert_infix_to_postfix("A * B + C")  # Test 1
-# v2_convert_infix_to_postfix("A + B * C ")  # Test 2
-# v2_convert_infix_to_postfix("A * (B + C)")  # Test 3
-# v2_convert_infix_to_postfix("A * (B + C * D) + E")
-
-# Version 3 Tests -- Working/Submittable version
-#v3_convert_infix_to_postfix("A * B + C")  # Test 1 - Pass
-#v3_convert_infix_to_postfix("A + B * C ")  # Test 2 - Pass
-# v3_convert_infix_to_postfix("A*(B+C)")  # Test 3 - Pass
-#v3_convert_infix_to_postfix("A - B + C")  # Test 4 - Pass
-v3_convert_infix_to_postfix("A * B ^ C + D ")  # Test 5 - Fail
-#v3_convert_infix_to_postfix("A * (B + C * D) + E")  # Test 6 - Fail
+# Tests from: http://www.oxfordmathcenter.com/drupal7/node/628
+# convert_infix_to_postfix("A*B+C")  # Test 1
+# convert_infix_to_postfix("A+B*C")  # Test 2
+# convert_infix_to_postfix("A*(B+C)")  # Test 3
+# convert_infix_to_postfix("A-B+C")  # Test 4
+# convert_infix_to_postfix("A*B^C+D")  # Test 5
+convert_infix_to_postfix("A*(B+C*D)+E")  # Test 6
