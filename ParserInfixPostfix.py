@@ -1,14 +1,119 @@
 # This program converts an infix expression to postfix expression
-# Operators: ., |, *
-# Alphabet: a,b,c
-# Include more operators + expand alphabet eventually
-# Algorithm reference: https://brilliant.org/wiki/shunting-yard-algorithm/
+# Author: Morgan Reilly - G00303598
 
-stack = []  # Used to store operations: https://dbader.org/blog/stacks-in-python
+# Algorithm references:
+# https://brilliant.org/wiki/shunting-yard-algorithm/
+# https://web.microsoftstream.com/video/a29536d4-e975-4172-a470-40b4fe28866e
+
+stack = []  # Shunting store: https://dbader.org/blog/stacks-in-python
 output = []  # used to store output: https://dbader.org/blog/queues-in-python
-token = []  # used to store tokens being read in: https://dbader.org/blog/stacks-in-python
+SYMBOLS = ['*', '-', '+', '^', '|', '.']  # define operators to be included
 
-SYMBOLS = ['*', '-', '+', '^']  # define operators to be included
+
+def v3_convert_infix_to_postfix(infix_expression):
+    print("INFIX: ", infix_expression)
+    # loop through input
+    for i, token in enumerate(infix_expression):
+        print(i, " >   Input: ", token, "   Stack: ", stack,"   Output: ", output)
+
+        if token is '(':
+            stack.append(token)
+
+        if token.isalpha() or token.isdigit():
+            output.append(token)
+
+        if token in SYMBOLS:
+            if len(stack) is 0:
+                # means nothing on stack
+                stack.append(token)
+            else:
+                # compare both tokens to determine precedence
+                token_precedence = check_precedence(token)  # gets precedence value of input
+                stack_precedence = check_precedence(stack[-1])  # gets precedence value of top of stack
+
+                if token_precedence >= stack_precedence:
+                    if token is '(':
+                        stack.pop()
+                    else:
+                        stack.append(token)
+
+                elif token_precedence <= stack_precedence:
+                    if token is '(':
+                        stack.pop()
+                    else:
+                        to_output = stack.pop()  # stores token to send to output
+                        output.append(to_output)
+                        stack.append(token)
+
+        # if right bracket encountered
+        if token is ')':
+            # pop all from stack to output
+            for i, el in enumerate(stack):
+                to_output = stack.pop()
+                output.append(to_output)
+                if el is '(':
+                    stack.pop()
+    print(stack)
+    # clear remainder on stack
+    while stack:
+        to_output = stack.pop()
+        output.append(to_output)
+
+    print(output)
+    # print("POSTFIX: ", ''.join(output))  # prints as string
+# END V3
+
+
+def v2_convert_infix_to_postfix(infix_expression):
+    # loop through input
+    for token in infix_expression:
+        stack_count = len(stack)
+
+        # print("INPUT: ", token)
+        # print("STACK: ", stack)
+        # print("OUTPUT: ", output)
+        # print("STACK_COUNT: ", stack_count)
+
+        if token.isalpha() or token.isdigit():
+            output.append(token)
+
+        if token is '(':
+            stack.append(token)
+
+        if token in SYMBOLS:
+            stack.append(token)
+            if stack_count > 0:
+                input_precedence = check_precedence(token)
+                stack_item = stack
+                stack_precedence = check_precedence(stack_item)
+
+                if stack_item in SYMBOLS:
+                    if input_precedence <= stack_precedence:
+                        output.append(stack_item)
+
+                    if input_precedence >= stack_precedence:
+                        stack.append(token)
+
+        if token is ')':
+            # While stack is not (
+            for i in stack:
+                if i is '(':
+                    stack.pop()
+                else:
+                    output.append(stack.pop())
+
+    stack_count = len(stack)
+    # Clear stack + append to output
+    for i in range(stack_count):
+        stack_item = stack.pop()
+        if i is '(':
+            # ( encountered
+            continue
+        else:
+            output.append(stack_item)
+
+    print(stack)
+    print(output)
 
 
 def convert_infix_to_postfix(infix_expression):
@@ -41,6 +146,7 @@ def convert_infix_to_postfix(infix_expression):
                         continue
                     if to_output in SYMBOLS:
                         output.append(to_output)  # add to output stack
+
             # Add token to the stack
             stack.append(token)
 
@@ -49,9 +155,11 @@ def convert_infix_to_postfix(infix_expression):
 
         if token is ')':
             for i in stack:
-                token_to_check = i
-                if token_to_check is '(':
-                    stack.pop()
+                stack_item = stack.pop()
+                if i is '(':
+                    continue
+                else:
+                    output.append(stack_item)
 
     # Put remainder of stack onto output
     # count number of elements left in list
@@ -59,6 +167,7 @@ def convert_infix_to_postfix(infix_expression):
     for i in range(stack_count):
         output.append(stack.pop())
 
+    print(stack)
     print(output)
 
 
@@ -69,6 +178,8 @@ def check_precedence(input_token):
         return 2
     if input_token is '+' or input_token is '-':
         return 1
+    if input_token is ')' or input_token is '(':
+        return -1
 
 
 # TESTS FROM: http://www.oxfordmathcenter.com/drupal7/node/628
@@ -76,6 +187,19 @@ def check_precedence(input_token):
 # convert_infix_to_postfix("A + B * C ")  # Test 2 - Pass
 # convert_infix_to_postfix("A * (B + C)")  # Test 3 - Pass
 # convert_infix_to_postfix("A - B + C")  # Test 4 - Pass
-# convert_infix_to_postfix("A * B ^ C + D ")  # Test 5 -- Fail, * after + for some reason
-convert_infix_to_postfix("A * (B + C * D) + E")  # Test 6
+# convert_infix_to_postfix("A * B ^ C + D ")  # Test 5 - Fail
+# convert_infix_to_postfix("A * (B + C * D) + E")  # Test 6 - Fail
 
+# VERSION 2 TESTS -- Version was set up for V3, but mostly a fail.
+# v2_convert_infix_to_postfix("A * B + C")  # Test 1
+# v2_convert_infix_to_postfix("A + B * C ")  # Test 2
+# v2_convert_infix_to_postfix("A * (B + C)")  # Test 3
+# v2_convert_infix_to_postfix("A * (B + C * D) + E")
+
+# Version 3 Tests -- Working/Submittable version
+#v3_convert_infix_to_postfix("A * B + C")  # Test 1 - Pass
+#v3_convert_infix_to_postfix("A + B * C ")  # Test 2 - Pass
+# v3_convert_infix_to_postfix("A*(B+C)")  # Test 3 - Pass
+#v3_convert_infix_to_postfix("A - B + C")  # Test 4 - Pass
+v3_convert_infix_to_postfix("A * B ^ C + D ")  # Test 5 - Fail
+#v3_convert_infix_to_postfix("A * (B + C * D) + E")  # Test 6 - Fail
