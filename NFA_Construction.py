@@ -4,3 +4,9 @@
 # References:
 # https://swtch.com/~rsc/regexp/regexp1.html
 
+
+stack = [] # NFA Store
+
+def postfix_to_nfa(post_fix):
+    for i, token in enumerate(post_fix):
+        if
