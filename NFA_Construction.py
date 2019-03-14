@@ -31,8 +31,9 @@ def regex_compiler(postfix_expression):
     nfa_stack = []
 
     for i, token in enumerate(postfix_expression):
-        # TODO: Include other special characters.. ie. +, -, ^
+        # TODO: Include other special characters.. ie. ?, +
         # if special character
+        # Concatenation
         if token is '.':
             # popping in LIFO order
             nfa_1, nfa_0 = nfa_stack.pop(), nfa_stack.pop()
@@ -43,7 +44,7 @@ def regex_compiler(postfix_expression):
             # push nfa back onto stack
             new_nfa = Nfa(nfa_0.initial_state, nfa_1.accept_state)
             nfa_stack.append(new_nfa)
-
+        # Alteration
         elif token is '|':
             # Pop 2 nfa from stack in LIFO order
             nfa_1, nfa_0 = nfa_stack.pop(), nfa_stack.pop()
@@ -60,6 +61,7 @@ def regex_compiler(postfix_expression):
             new_nfa = Nfa(initial_state, accept_state)
             nfa_stack.append(new_nfa)
 
+        # Zero or more
         elif token is '*':
             # pop NFA from stack
             nfa_0 = nfa_stack.pop()
@@ -76,6 +78,26 @@ def regex_compiler(postfix_expression):
             # push new NFA to stack
             new_nfa = Nfa(initial_state, accept_state)
             nfa_stack.append(new_nfa)
+
+        # Zero or one
+        elif token is '?':
+            # TODO: THIS COULD BE QUITE WRONG
+            # pop NFA from stack
+            nfa_0 = nfa_stack.pop()
+
+            # create initial + accept state
+            initial_state, accept_state = State(), State()
+
+            # join old accept to new accept and NFA0 initial state
+            nfa_0.accept_state.edge1, nfa_0.accept_state.edge2 = nfa_0.initial_state, accept_state
+
+            # push new NFA to stack
+            new_nfa = Nfa(initial_state, accept_state)
+            nfa_stack.append(new_nfa)
+
+        # One or more
+        elif token is '+':
+            continue
 
         # if not regular character
         else:
