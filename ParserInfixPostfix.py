@@ -24,7 +24,7 @@ def convert_infix_to_postfix(infix_expression):
             # then pop from stack
             while stack[-1] is not '(':
                 output.append(stack[-1])
-                del stack[-1]
+                del stack[-1]  # del stack[-1] is equivalent to stack.pop()
             # left bracket encountered, pop from stack
             del stack[-1]
         # operator encountered
@@ -44,9 +44,9 @@ def convert_infix_to_postfix(infix_expression):
         del stack[-1]
 
     # print(output)  # prints as list
-    print("POSTFIX: ", ''.join(output))  # prints as string
-    return output
-# END
+    # print("POSTFIX: ", ''.join(output))  # prints as string
+    postfix_expression = ''.join(output)
+    return postfix_expression  # returns as string
 
 
 # Tests from: http://www.oxfordmathcenter.com/drupal7/node/628
@@ -56,4 +56,4 @@ def convert_infix_to_postfix(infix_expression):
 # convert_infix_to_postfix("A-B+C")  # Test 4 -- A B - C +
 # convert_infix_to_postfix("A*B^C+D")  # Test 5 -- A B C ^ * D +
 # convert_infix_to_postfix("A*(B+C*D)+E")  # Test 6 -- A B C D * + * E +
-convert_infix_to_postfix("(0|(1(01*(00)*0)*1)*)*")
+print("POSTFIX: ", convert_infix_to_postfix("(0|(1(01*(00)*0)*1)*)*"))
