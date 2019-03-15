@@ -32,7 +32,6 @@ def regex_compiler(postfix_expression):
 
     for i, token in enumerate(postfix_expression):
         # TODO: Include other special characters.. ie. ?, +
-        # if special character
         # Concatenation
         if token is '.':
             # popping in LIFO order
@@ -44,6 +43,7 @@ def regex_compiler(postfix_expression):
             # push nfa back onto stack
             new_nfa = Nfa(nfa_0.initial_state, nfa_1.accept_state)
             nfa_stack.append(new_nfa)
+
         # Alteration
         elif token is '|':
             # Pop 2 nfa from stack in LIFO order
@@ -81,14 +81,14 @@ def regex_compiler(postfix_expression):
 
         # Zero or one
         elif token is '?':
-            # TODO: THIS COULD BE QUITE WRONG
+            # TODO: NO IDEA IF THIS WORKS
             # pop NFA from stack
             nfa_0 = nfa_stack.pop()
 
-            # create initial + accept state
+            # create initial state + accept state
             initial_state, accept_state = State(), State()
 
-            # join old accept to new accept and NFA0 initial state
+            # join old accept state to new accept state and NFA0 initial state
             nfa_0.accept_state.edge1, nfa_0.accept_state.edge2 = nfa_0.initial_state, accept_state
 
             # push new NFA to stack
@@ -97,7 +97,22 @@ def regex_compiler(postfix_expression):
 
         # One or more
         elif token is '+':
-            continue
+            # TODO: NO IDEA IF THIS WORKS
+            # popping in LIFO order
+            nfa_0 = nfa_stack.pop()
+
+            # create initial state + accept state
+            initial_state, accept_state = State(), State()
+
+            # join accept to NFA0 initial state
+            accept_state = nfa_0.accept_state.edge1
+
+            # join initial state of NFA to accept state
+            initial_state.edge1 = accept_state
+
+            # push new NFA to stack
+            new_nfa = Nfa(initial_state, accept_state)
+            nfa_stack.append(new_nfa)
 
         # if not regular character
         else:
@@ -116,4 +131,6 @@ def regex_compiler(postfix_expression):
     final_nfa = nfa_stack.pop()
     return final_nfa
 
+
 # print(regex_compiler("010100*0*1**|*"))
+print(regex_compiler("ab+"))
