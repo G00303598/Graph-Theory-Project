@@ -158,18 +158,21 @@ def regex_compiler(postfix_expression):
 
         # One or more
         elif token is '+':
-            # Pop NFA from stack
+            # pop NFA from stack
             nfa_0 = nfa_stack.pop()
 
             # create initial + accept state
             initial_state = State()
             accept_state = State()
 
-            # jo
-            nfa_0.accept_state.edge1 = accept_state
+            # join initial edge 1 to NFA initial state
+            initial_state.edge1 = nfa_0.initial_state
 
-            # join old accept to new accept and NFA0 initial state
+            # join nfa edge 1 to nfa initial
             nfa_0.accept_state.edge1 = nfa_0.initial_state
+
+            # join nfa edge 2 to accept state
+            nfa_0.accept_state.edge2 = accept_state
 
             # push new NFA to stack
             new_nfa = Nfa(initial_state, accept_state)
@@ -251,8 +254,8 @@ def follow_edge_state(state_to_follow):
 # string_list = ["", "ab"]
 
 # Tests +
-infix_list = ["a.b+"]
-string_list = ["", "abb", "aaab", "abbbbbb"]
+infix_list = ["a+"]
+string_list = ["", "a", "ab", "abbb"]
 
 # Test 2
 # infix_list = ["(0|(1(01*(00)*0)*1)*)*"]
