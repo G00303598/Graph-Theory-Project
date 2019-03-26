@@ -254,7 +254,7 @@ def follow_edge_state(state_to_follow):
 # string_list = ["", "ab"]
 
 # Tests +
-infix_list = ["a+"]
+infix_list = ["a+a"]
 string_list = ["", "a", "ab", "abbb"]
 
 # Test 2
