@@ -255,7 +255,7 @@ def follow_edge_state(state_to_follow):
 
 # Tests +
 infix_list = ["a+a"]
-string_list = ["", "a", "ab", "abbb"]
+string_list = ["", "a", "aaaaa", "abbb"]
 
 # Test 2
 # infix_list = ["(0|(1(01*(00)*0)*1)*)*"]
