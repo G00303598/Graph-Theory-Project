@@ -9,7 +9,7 @@
 def convert_infix_to_postfix(infix_expression):
     stack = []  # Shunting store: https://dbader.org/blog/stacks-in-python
     output = []  # used to store output: https://dbader.org/blog/queues-in-python
-    symbols = {'^': 40, '*': 30, '+': 20, '-': 20, '.': 20, '|': 10}  # define operators to be included in dictionary
+    symbols = {'^': 40, '?': 30, '*': 30, '+': 20, '-': 20, '.': 20, '|': 10}  # define operators to be included in dictionary
 
     print("INFIX: ", infix_expression)
 
@@ -56,4 +56,5 @@ def convert_infix_to_postfix(infix_expression):
 # convert_infix_to_postfix("A-B+C")  # Test 4 -- A B - C +
 # convert_infix_to_postfix("A*B^C+D")  # Test 5 -- A B C ^ * D +
 # convert_infix_to_postfix("A*(B+C*D)+E")  # Test 6 -- A B C D * + * E +
-print("POSTFIX: ", convert_infix_to_postfix("(0|(1(01*(00)*0)*1)*)*"))
+# print("POSTFIX: ", convert_infix_to_postfix("(0|(1(01*(00)*0)*1)*)*"))
+print("Postfix: ", convert_infix_to_postfix("a.b?"))

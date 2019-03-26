@@ -81,7 +81,6 @@ def regex_compiler(postfix_expression):
 
         # Zero or one
         elif token is '?':
-            # TODO: NO IDEA IF THIS WORKS
             # pop NFA from stack
             nfa_0 = nfa_stack.pop()
 

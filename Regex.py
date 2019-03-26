@@ -9,6 +9,8 @@
 # References for Shunting Yard algorithm:
 # https://brilliant.org/wiki/shunting-yard-algorithm/
 # https://web.microsoftstream.com/video/a29536d4-e975-4172-a470-40b4fe28866e
+# https://www.boost.org/doc/libs/1_56_0/libs/regex/doc/html/boost_regex/syntax/basic_extended.html#boost_regex.syntax.basic_extended.operator_precedence
+# https://regex101.com/
 
 # References for NFA construction:
 # https://swtch.com/~rsc/regexp/regexp1.html
@@ -23,7 +25,7 @@
 def convert_infix_to_postfix(infix_expression):
     stack = []  # Shunting store: https://dbader.org/blog/stacks-in-python
     output = []  # used to store output: https://dbader.org/blog/queues-in-python
-    symbols = {'^': 40, '*': 30, '+': 20, '-': 20, '.': 20, '|': 10}  # define operators to be included in dictionary
+    symbols = {'^': 40, '?': 30, '*': 30, '+': 20, '-': 20, '.': 20, '|': 10}  # define operators to be included in dictionary
 
     # print("INFIX: ", infix_expression)
 
@@ -58,7 +60,7 @@ def convert_infix_to_postfix(infix_expression):
         del stack[-1]
 
     # print(output)  # prints as list
-    # print("POSTFIX: ", ''.join(output))  # prints as string
+    print("POSTFIX: ", ''.join(output))  # prints as string
     postfix_expression = ''.join(output)
     return postfix_expression  # returns as string
 
@@ -87,7 +89,6 @@ def regex_compiler(postfix_expression):
     nfa_stack = []
 
     for i, token in enumerate(postfix_expression):
-        # TODO: Include other special characters.. ie. ?, +
         # Concatenation
         if token is '.':
             # popping in LIFO order
@@ -137,15 +138,19 @@ def regex_compiler(postfix_expression):
 
         # Zero or one
         elif token is '?':
-            # TODO: NO IDEA IF THIS WORKS
             # pop NFA from stack
             nfa_0 = nfa_stack.pop()
 
-            # create initial state + accept state
-            initial_state, accept_state = State(), State()
+            # create initial + accept state
+            initial_state = State()
+            accept_state = State()
 
-            # join old accept state to new accept state and NFA0 initial state
-            nfa_0.accept_state.edge1, nfa_0.accept_state.edge2 = nfa_0.initial_state, accept_state
+            # join new initial to old NFA0 initial state and new accept state
+            initial_state.edge1 = nfa_0.initial_state
+            initial_state.edge2 = accept_state
+
+            # join old accept to new accept and NFA0 initial state
+            nfa_0.accept_state.edge1 = accept_state
 
             # push new NFA to stack
             new_nfa = Nfa(initial_state, accept_state)
@@ -153,18 +158,18 @@ def regex_compiler(postfix_expression):
 
         # One or more
         elif token is '+':
-            # TODO: NO IDEA IF THIS WORKS
-            # popping in LIFO order
+            # Pop NFA from stack
             nfa_0 = nfa_stack.pop()
 
-            # create initial state + accept state
-            initial_state, accept_state = State(), State()
+            # create initial + accept state
+            initial_state = State()
+            accept_state = State()
 
-            # join accept to NFA0 initial state
-            accept_state = nfa_0.accept_state.edge1
+            # jo
+            nfa_0.accept_state.edge1 = accept_state
 
-            # join initial state of NFA to accept state
-            initial_state.edge1 = accept_state
+            # join old accept to new accept and NFA0 initial state
+            nfa_0.accept_state.edge1 = nfa_0.initial_state
 
             # push new NFA to stack
             new_nfa = Nfa(initial_state, accept_state)
@@ -237,13 +242,21 @@ def follow_edge_state(state_to_follow):
     return states
 
 
-# Tests
+# Tests - Generic
 # infix_list = ["a.b.c*", "a.(b|d).c*", "(a.(b|d))*", "a.(b.b)*.c"]
-# string_list = ["", "abc", "abbc", "abcc", "abad", "abbbc"]
+# string_list = ["", "ab", "abc", "abbc", "abcc", "abad", "abbbc"]
+
+# Tests ? -- quite basic just to confirm working functionality
+# infix_list = ["a.b?"]
+# string_list = ["", "ab"]
+
+# Tests +
+infix_list = ["a.b+"]
+string_list = ["", "abb", "aaab", "abbbbbb"]
 
 # Test 2
-infix_list = ["(0|(1(01*(00)*0)*1)*)*"]
-string_list = ["", "0", "00", "11", "000", "011", "110", "0000", "0011", "0110", "1001", "1100", "1111", "00000"]
+# infix_list = ["(0|(1(01*(00)*0)*1)*)*"]
+# string_list = ["", "0", "00", "11", "000", "011", "110", "0000", "0011", "0110", "1001", "1100", "1111", "00000"]
 
 
 # Runner
