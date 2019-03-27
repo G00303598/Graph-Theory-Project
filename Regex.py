@@ -165,13 +165,11 @@ def regex_compiler(postfix_expression):
             initial_state = State()
             accept_state = State()
 
-            # join initial edge 1 to NFA initial state
+            # join new initial to old NFA0 initial state and new accept state
             initial_state.edge1 = nfa_0.initial_state
 
-            # join nfa edge 1 to nfa initial
+            # join old accept to new accept and NFA0 initial state
             nfa_0.accept_state.edge1 = nfa_0.initial_state
-
-            # join nfa edge 2 to accept state
             nfa_0.accept_state.edge2 = accept_state
 
             # push new NFA to stack
@@ -250,12 +248,16 @@ def follow_edge_state(state_to_follow):
 # string_list = ["", "ab", "abc", "abbc", "abcc", "abad", "abbbc"]
 
 # Tests ? -- quite basic just to confirm working functionality
-# infix_list = ["a.b?"]
-# string_list = ["", "ab"]
+# infix_list = ["a.b.c?"]
+# string_list = ["", "ab", "abc", "abbc", "abcc", "abad", "abbbc", "abcabc"]
 
 # Tests +
-infix_list = ["a+a"]
-string_list = ["", "a", "aaaaa", "abbb"]
+# infix_list = ["a.b.c+"]
+# string_list = ["", "ab", "abc", "abbc", "abcc", "abad", "abbbc", "abcabc"]
+
+# other tests
+infix_list = ["(a.a)+"]
+string_list = ["", "a", "aa", "aaa", "aaaa"]
 
 # Test 2
 # infix_list = ["(0|(1(01*(00)*0)*1)*)*"]
