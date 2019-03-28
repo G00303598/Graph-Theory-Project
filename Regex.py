@@ -25,7 +25,8 @@
 def convert_infix_to_postfix(infix_expression):
     stack = []  # Shunting store: https://dbader.org/blog/stacks-in-python
     output = []  # used to store output: https://dbader.org/blog/queues-in-python
-    symbols = {'^': 40, '?': 30, '*': 30, '+': 20, '-': 20, '.': 20, '|': 10}  # define operators to be included in dictionary
+    symbols = {'^': 40, '?': 30, '*': 30, '+': 20, '-': 20, '.': 20,
+               '|': 10}  # define operators to be included in dictionary
 
     # print("INFIX: ", infix_expression)
 
@@ -89,8 +90,8 @@ def regex_compiler(postfix_expression):
     nfa_stack = []
 
     for i, token in enumerate(postfix_expression):
-        # Concatenation
         if token is '.':
+            """CONCATENATION"""
             # popping in LIFO order
             nfa_1, nfa_0 = nfa_stack.pop(), nfa_stack.pop()
 
@@ -101,76 +102,73 @@ def regex_compiler(postfix_expression):
             new_nfa = Nfa(nfa_0.initial_state, nfa_1.accept_state)
             nfa_stack.append(new_nfa)
 
-        # Alteration
         elif token is '|':
+            """ALTERNATION"""
             # Pop 2 nfa from stack in LIFO order
             nfa_1, nfa_0 = nfa_stack.pop(), nfa_stack.pop()
 
-            # create new initial state.
-            # connect to initial state from 2 NFAs popped from stack
+            # create new initial state and accept state
             initial_state, accept_state = State(), State()
+
+            # connect to initial state from 2 NFAs popped from stack
             initial_state.edge1, initial_state.edge2 = nfa_0.initial_state, nfa_1.initial_state
 
-            # creating accept state connecting accept states from popped NFAs
+            # join nfa0 accept state to accept state and join nfa1 accept state to accept state
             nfa_0.accept_state.edge1, nfa_1.accept_state.edge1 = accept_state, accept_state
 
             # Push NFA to stack
             new_nfa = Nfa(initial_state, accept_state)
             nfa_stack.append(new_nfa)
 
-        # Zero or more
         elif token is '*':
+            """ZERO OR MORE"""
             # pop NFA from stack
             nfa_0 = nfa_stack.pop()
 
             # create initial + accept state
             initial_state, accept_state = State(), State()
 
-            # join new initial to old NFA0 initial state and new accept state
+            # join initial state to nfa and join initial state to accept state
             initial_state.edge1, initial_state.edge2 = nfa_0.initial_state, accept_state
 
-            # join old accept to new accept and NFA0 initial state
+            # join nfa accept state to nfa initial state and join nfa accept state to accept state
             nfa_0.accept_state.edge1, nfa_0.accept_state.edge2 = nfa_0.initial_state, accept_state
 
             # push new NFA to stack
             new_nfa = Nfa(initial_state, accept_state)
             nfa_stack.append(new_nfa)
 
-        # Zero or one
         elif token is '?':
+            """ZERO OR ONE"""
             # pop NFA from stack
             nfa_0 = nfa_stack.pop()
 
             # create initial + accept state
-            initial_state = State()
-            accept_state = State()
+            initial_state, accept_state = State(), State()
 
-            # join new initial to old NFA0 initial state and new accept state
-            initial_state.edge1 = nfa_0.initial_state
-            initial_state.edge2 = accept_state
+            # join new initial state to nfa initial state and join initial state to accept state
+            initial_state.edge1, initial_state.edge2 = nfa_0.initial_state, accept_state
 
-            # join old accept to new accept and NFA0 initial state
+            # join nfa accept state to accept state
             nfa_0.accept_state.edge1 = accept_state
 
             # push new NFA to stack
             new_nfa = Nfa(initial_state, accept_state)
             nfa_stack.append(new_nfa)
 
-        # One or more
         elif token is '+':
+            """ONE OR MORE"""
             # pop NFA from stack
             nfa_0 = nfa_stack.pop()
 
             # create initial + accept state
-            initial_state = State()
-            accept_state = State()
+            initial_state, accept_state = State(), State()
 
-            # join new initial to old NFA0 initial state and new accept state
+            # join initial state to nfa initial state
             initial_state.edge1 = nfa_0.initial_state
 
-            # join old accept to new accept and NFA0 initial state
-            nfa_0.accept_state.edge1 = nfa_0.initial_state
-            nfa_0.accept_state.edge2 = accept_state
+            # join nfa accept state to initial state and join nfa accept state to accept state
+            nfa_0.accept_state.edge1, nfa_0.accept_state.edge2 = nfa_0.initial_state, accept_state
 
             # push new NFA to stack
             new_nfa = Nfa(initial_state, accept_state)
@@ -223,7 +221,7 @@ def match_infix_to_string(infix_expression, string_in):
 
 
 def follow_edge_state(state_to_follow):
-    """ Helper function: returns the set of states reached from state following e arrows"""
+    """ Helper function: returns the set of states reached from state following edge arrows"""
 
     # create a new set with state as its only member
     states = set()
@@ -243,23 +241,15 @@ def follow_edge_state(state_to_follow):
     return states
 
 
-# Tests - Generic
+# Tests 1 - From video: https://web.microsoftstream.com/video/6b4ba6a4-01b7-4bde-8f85-b4b96abc902a
 # infix_list = ["a.b.c*", "a.(b|d).c*", "(a.(b|d))*", "a.(b.b)*.c"]
 # string_list = ["", "ab", "abc", "abbc", "abcc", "abad", "abbbc"]
 
-# Tests ? -- quite basic just to confirm working functionality
-# infix_list = ["a.b.c?"]
-# string_list = ["", "ab", "abc", "abbc", "abcc", "abad", "abbbc", "abcabc"]
+# Tests 2 - Testing operators: + ? -- Verifying correct functionality with basic tests
+infix_list = ["(a.b)+", "(a.b)?"]
+string_list = ["", "a", "ab", "aaa", "abab", "ababab"]
 
-# Tests +
-# infix_list = ["a.b.c+"]
-# string_list = ["", "ab", "abc", "abbc", "abcc", "abad", "abbbc", "abcabc"]
-
-# other tests
-infix_list = ["(a.a)+"]
-string_list = ["", "a", "aa", "aaa", "aaaa"]
-
-# Test 2
+# Test 3 -- Recursion issue -- FIX HELPER!
 # infix_list = ["(0|(1(01*(00)*0)*1)*)*"]
 # string_list = ["", "0", "00", "11", "000", "011", "110", "0000", "0011", "0110", "1001", "1100", "1111", "00000"]
 
@@ -268,4 +258,3 @@ string_list = ["", "a", "aa", "aaa", "aaaa"]
 for i, infix in enumerate(infix_list):
     for j, string in enumerate(string_list):
         print(match_infix_to_string(infix, string), infix, string)
-
