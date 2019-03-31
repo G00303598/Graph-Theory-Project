@@ -25,10 +25,11 @@
 def convert_infix_to_postfix(infix_expression):
     stack = []  # Shunting store: https://dbader.org/blog/stacks-in-python
     output = []  # used to store output: https://dbader.org/blog/queues-in-python
-    symbols = {'^': 40, '?': 30, '*': 30, '+': 20, '-': 20, '.': 20,
-               '|': 10}  # define operators to be included in dictionary
 
-    # print("INFIX: ", infix_expression)
+    # define operators to be included in dictionary
+    symbols = {'^': 40, '?': 30, '*': 30, '+': 20, '-': 20, '.': 20, '|': 10}
+
+    print("INFIX: ", infix_expression)
 
     # loop through input
     for i, token in enumerate(infix_expression):
@@ -47,7 +48,7 @@ def convert_infix_to_postfix(infix_expression):
         # operator encountered
         elif token in symbols:
             # while stack has a operator of greater precedence than input
-            while stack and symbols.get(token, 0) <= symbols.get(stack[-1], 0):
+            while stack and symbols[token] <= symbols.get(stack[-1], 0):
                 output.append(stack[-1])
                 del stack[-1]
             # push lesser operator to stack
@@ -242,19 +243,26 @@ def follow_edge_state(state_to_follow):
 
 
 # Tests 1 - From video: https://web.microsoftstream.com/video/6b4ba6a4-01b7-4bde-8f85-b4b96abc902a
-# infix_list = ["a.b.c*", "a.(b|d).c*", "(a.(b|d))*", "a.(b.b)*.c"]
-# string_list = ["", "ab", "abc", "abbc", "abcc", "abad", "abbbc"]
+infix_list = ["a.b.c*", "a.(b|d).c*", "(a.(b|d))*", "a.(b.b)*.c"]
+string_list = ["", "ab", "abc", "abbc", "abcc", "abad", "abbbc"]
 
 # Tests 2 - Testing operators: + ? -- Verifying correct functionality with basic tests
-infix_list = ["(a.b)+", "(a.b)?"]
-string_list = ["", "a", "ab", "aaa", "abab", "ababab"]
+# infix_list = ["(a.b)+", "(a.b)?"]
+# string_list = ["", "a", "ab", "aaa", "abab", "ababab"]
 
-# Test 3 -- Recursion issue -- FIX HELPER!
+# Test set 3 -- Recursion issue -- FIX HELPER!
 # infix_list = ["(0|(1(01*(00)*0)*1)*)*"]
 # string_list = ["", "0", "00", "11", "000", "011", "110", "0000", "0011", "0110", "1001", "1100", "1111", "00000"]
 
+# User input
+infix_expression_input = input("Enter infix expression\n >")
+string_input = input("Enter string to compare\n >")
 
-# Runner
-for i, infix in enumerate(infix_list):
-    for j, string in enumerate(string_list):
-        print(match_infix_to_string(infix, string), infix, string)
+# Runner -- for use with lists
+# for i, infix in enumerate(infix_list):
+#    for j, string in enumerate(string_list):
+#        print("INPUT: ", string_input, "\nRESULT: ", match_infix_to_string(infix_expression_input, string_input))
+
+# Runner -- For use with user input
+print("INPUT: ", string_input, "\nRESULT: ", match_infix_to_string(infix_expression_input, string_input))
+

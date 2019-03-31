@@ -56,5 +56,5 @@ def convert_infix_to_postfix(infix_expression):
 # convert_infix_to_postfix("A-B+C")  # Test 4 -- A B - C +
 # convert_infix_to_postfix("A*B^C+D")  # Test 5 -- A B C ^ * D +
 # convert_infix_to_postfix("A*(B+C*D)+E")  # Test 6 -- A B C D * + * E +
-# print("POSTFIX: ", convert_infix_to_postfix("(0|(1(01*(00)*0)*1)*)*"))
-print("Postfix: ", convert_infix_to_postfix("a+b"))
+print("POSTFIX: ", convert_infix_to_postfix("(0|(1(01*(00)*0)*1)*)*"))
+# print("Postfix: ", convert_infix_to_postfix("a.b.c*", "a.(b|d).c*", "(a.(b|d))*", "a.(b.b)*.c*"))
