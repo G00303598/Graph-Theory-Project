@@ -263,6 +263,6 @@ string_input = input("Enter string to compare\n >")
 #    for j, string in enumerate(string_list):
 #        print("INPUT: ", string_input, "\nRESULT: ", match_infix_to_string(infix_expression_input, string_input))
 
+
 # Runner -- For use with user input
 print("INPUT: ", string_input, "\nRESULT: ", match_infix_to_string(infix_expression_input, string_input))
-
